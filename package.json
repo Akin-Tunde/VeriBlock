@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@reown/appkit": "^1.8.15",
+    "@reown/appkit-adapter-bitcoin": "^1.8.15",
+    "@reown/walletkit": "^1.4.1",
+    "@stacks/connect": "^8.2.4",
+    "@stacks/network": "^7.3.1",
+    "@stacks/transactions": "^7.3.1",
+    "@walletconnect/core": "^2.23.1",
+    "@walletconnect/utils": "^2.23.1"
+  }
+}
