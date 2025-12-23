@@ -1,10 +1,7 @@
-Excellent choice. **VeriBlock** sounds professional, secure, and clearly communicates the purpose of the application.
-
-Here is your updated **README.md**, fully tailored to the **VeriBlock** branding and incorporating the technical improvements we discussed (like the timestamped smart contract logic).
 
 ---
 
-# 🛡️ VeriBlock: Decentralized Digital Notary
+# 🛡️ VeriBlock
 ### *Secure, private, and immutable document notarization anchored on Bitcoin.*
 
 **VeriBlock** is a high-integrity "Proof of Existence" dApp built on the **Stacks L2** blockchain. It allows users to create a permanent, verifiable record of any digital file by anchoring its SHA-256 fingerprint directly into the Bitcoin blockchain.
