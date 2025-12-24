@@ -6,11 +6,11 @@ export const CONFIG = {
   networkType: NETWORK_TYPE,
   network: NETWORK_TYPE === 'mainnet' ? new StacksMainnet() : new StacksTestnet(),
   contractAddress: NETWORK_TYPE === 'mainnet' 
-    ? 'SP3FBR...' // Your Mainnet Address
-    : 'ST1PQHQKV... ', // Your Local/Testnet Address
-  contractName: 'notary',
+    ? 'SP...' 
+    : 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM', // Standard Devnet/Testnet deployer
+  contractName: 'veriblock',
   appDetails: {
-    name: 'Decentralized Notary',
+    name: 'VeriBlock Notary',
     icon: window.location.origin + '/logo.png',
   }
 };
