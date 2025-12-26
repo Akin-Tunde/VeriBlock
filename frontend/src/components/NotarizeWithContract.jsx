@@ -1,86 +1,58 @@
-import React, { useState } from 'react'
-import { sha256 } from 'js-sha256'
-import { showConnect, openContractCall } from '@stacks/connect'
-import {
-  uintCV, bufferCV, hexToCV, cvToHex, standardPrincipalCV, makeStandardSTXPostCondition
-} from '@stacks/transactions'
-
-// IMPORTANT: depending on @stacks/connect version you might use `openContractCall` from @stacks/connect
-// or construct the transaction using @stacks/transactions + sign via the wallet. This file shows the
-// canonical pattern using connect's openContractCall helper.
-
-const CONTRACT_ADDRESS = 'SP3FBR2AGK2Y3PT1ZQW9...'; // <--- replace with your mainnet contract principal (owner)
-const CONTRACT_NAME = 'notary'; // contract filename without .clar
-const NETWORK = 'mainnet' // used only for UI links
+import React, { useState } from 'react';
+import { openContractCall } from '@stacks/connect';
+import { bufferCV } from '@stacks/transactions';
+import { CONFIG } from '../config';
+import { computeFileHash } from '../utils/hashing';
 
 export default function NotarizeWithContract() {
-  const [fileName, setFileName] = useState(null)
-  const [hashHex, setHashHex] = useState('')
-  const [status, setStatus] = useState('')
-  const [txId, setTxId] = useState(null)
+  const [fileData, setFileData] = useState({ name: '', hash: '' });
+  const [status, setStatus] = useState('');
+  const [txId, setTxId] = useState('');
 
-  async function handleFile(e) {
-    const file = e.target.files[0]
-    if (!file) return
-    setFileName(file.name)
-    const arrayBuffer = await file.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const digest = sha256(bytes)
-    setHashHex(digest)
-  }
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setStatus('Computing hash...');
+    const hash = await computeFileHash(file);
+    setFileData({ name: file.name, hash });
+    setStatus('Ready to notarize');
+  };
 
-  async function notarizeContract() {
-    if (!hashHex) return alert('Select a file first')
+  const notarize = async () => {
+    if (!fileData.hash) return;
+    setStatus('Requesting wallet...');
 
-    setStatus('Opening wallet...')
-    try {
-      await showConnect({ appName: 'Decentralized Notary', manifestPath: '/manifest.json' })
-
-      setStatus('Requesting contract call...')
-
-      // prepare function args: pass hash as a buffer (32 bytes) hex
-      const args = [
-        // bufferCV expects a hex string representing bytes
-        // hexToCV is not available in all versions — passing a hex string works with openContractCall and will be encoded
-        // Use bufferCV(hexToArray?) - different versions vary. openContractCall can accept `buffer` type via `hexToCV`.
-        // We'll pass the data as a hex string and set the type to 'buffer' in the connect call args.
-      ]
-
-      // Using openContractCall from @stacks/connect
-      await openContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'notarize',
-        functionArgs: [{ type: 'buffer', buffer: hashHex }],
-        postConditionMode: 'deny',
-        onFinish: data => {
-          setStatus('Submitted: ' + data.txId)
-          setTxId(data.txId)
-        },
-        onCancel: () => {
-          setStatus('User cancelled')
-        },
-      })
-    } catch (err) {
-      console.error(err)
-      setStatus('Error: ' + (err.message || String(err)))
-    }
-  }
+    await openContractCall({
+      network: CONFIG.network,
+      contractAddress: CONFIG.contractAddress,
+      contractName: CONFIG.contractName,
+      functionName: 'notarize',
+      functionArgs: [bufferCV(Buffer.from(fileData.hash, 'hex'))],
+      postConditionMode: 0x01, // Deny
+      onFinish: (data) => {
+        setTxId(data.txId);
+        setStatus('Transaction Broadcasted!');
+      },
+      onCancel: () => setStatus('Transaction Cancelled'),
+    });
+  };
 
   return (
-    <div className="contract">
-      <input type="file" onChange={handleFile} />
-      {fileName && <div>Selected: {fileName}</div>}
-      {hashHex && <div><strong>SHA-256:</strong> {hashHex}</div>}
-      <div style={{marginTop:8}}>
-        <button onClick={notarizeContract} disabled={!hashHex}>Notarize (contract call)</button>
-      </div>
-      <div className="status">{status}</div>
-      {txId && (
-        <div style={{marginTop:8}}>
-          <a href={`https://explorer.hiro.so/txid/${txId}?network=mainnet`} target="_blank" rel="noreferrer">View tx on Hiro Explorer</a>
+    <div className="card">
+      <h3>1. Notarize Document</h3>
+      <input type="file" onChange={handleFileChange} />
+      {fileData.hash && (
+        <div className="hash-box">
+          <p><strong>SHA-256:</strong> {fileData.hash}</p>
+          <button onClick={notarize}>Sign & Anchor to Bitcoin</button>
         </div>
       )}
+      <p className="status">{status}</p>
+      {txId && (
+        <a href={`${CONFIG.explorerBase}/txid/${txId}?network=${CONFIG.networkType}`} target="_blank">
+          View on Explorer
+        </a>
+      )}
     </div>
-  )
+  );
 }
