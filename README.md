@@ -11,7 +11,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
-
 ## 🌟 Key Features
 
 *   **Bitcoin Security:** VeriBlock leverages the security of the Bitcoin network through Stacks' Proof-of-Transfer (PoX) consensus.
