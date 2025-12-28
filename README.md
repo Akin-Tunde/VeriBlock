@@ -20,7 +20,6 @@
 *   **Ownership Protection:** The system records the wallet address of the notarizer, preventing others from claiming your original work.
 
 ---
-
 ## ⚙️ How It Works
 
 1.  **Local Hashing:** The app generates a unique SHA-256 hash (fingerprint) of your file.
