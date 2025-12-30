@@ -1,6 +1,5 @@
 
 ---
-
 # 🛡️ VeriBlock
 ### *Secure, private, and immutable document notarization anchored on Bitcoin.*
 
